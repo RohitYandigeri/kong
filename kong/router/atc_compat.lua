@@ -373,26 +373,6 @@ local function route_priority(r)
 end
 
 
-local yield
-do
-  -- ngx.sleep is re-implemented in globalpatches.lua
-  local ngx_sleep = ngx.sleep
-
-  local YIELD_ITERATIONS = 500
-  local counter = YIELD_ITERATIONS
-
-  yield = function()
-    counter = counter - 1
-    if counter > 0 then
-      return
-    end
-
-    counter = YIELD_ITERATIONS
-    ngx_sleep(0)
-  end
-end
-
-
 local function add_atc_matcher(inst, route, route_id,
                                is_traditional_compatible,
                                is_update)
@@ -490,7 +470,7 @@ local function new_from_previous(routes, is_traditional_compatible, old_router)
       add_atc_matcher(inst, route, route_id, is_traditional_compatible, true)
     end
 
-    yield()
+    yield(true)
   end
 
   -- remove routes
@@ -503,7 +483,7 @@ local function new_from_previous(routes, is_traditional_compatible, old_router)
       old_routes[id] = nil
     end
 
-    yield()
+    yield(true)
   end
 
   old_router.fields = inst:get_fields()
